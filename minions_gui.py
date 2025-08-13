@@ -327,17 +327,17 @@ def render_main_content():
         st.markdown("**Recovery Options:**")
         col1, col2, col3 = st.columns(3)
         with col1:
-                if st.button("🔄 Refresh Page"):
-                    st.rerun()
-            with col2:
-                if st.button("🔧 Check Status"):
-                    st.session_state.show_status = True
-            with col3:
-                if st.button("🆘 Reset App"):
-                    # Clear all session state
-                    for key in list(st.session_state.keys()):
-                        del st.session_state[key]
-                    st.rerun()
+            if st.button("🔄 Refresh Page"):
+                st.rerun()
+        with col2:
+            if st.button("🔧 Check Status"):
+                st.session_state.show_status = True
+        with col3:
+            if st.button("🆘 Reset App"):
+                # Clear all session state
+                for key in list(st.session_state.keys()):
+                    del st.session_state[key]
+                st.rerun()
 
 
 def render_status_page():
