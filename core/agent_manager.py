@@ -6,6 +6,7 @@ Manages both single agent and multi-agent system lifecycle with GUI integration.
 import os
 import logging
 import asyncio
+import time
 from typing import Dict, Any, List, Optional, Generator, Union
 from datetime import datetime
 
