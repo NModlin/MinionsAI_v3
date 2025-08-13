@@ -1,0 +1,197 @@
+# MinionsAI v3.1 - Example Configuration File
+# Copy this file to 'config.yaml' and customize as needed
+
+# Basic Settings
+app_name: "MinionsAI v3.1"
+version: "3.1.0"
+debug_mode: false
+
+# Ollama Configuration
+ollama:
+  base_url: "http://localhost:11434"
+  default_model: "llama3:8b"
+  timeout: 30
+  max_retries: 3
+  
+  # Alternative models (uncomment to use)
+  # default_model: "llama3.1:8b"    # Latest Llama model
+  # default_model: "mistral:7b"     # Faster alternative
+  # default_model: "codellama:7b"   # Better for coding tasks
+
+# Streamlit GUI Settings
+gui:
+  host: "localhost"
+  port: 8501
+  theme: "light"  # light, dark, auto
+  page_title: "MinionsAI v3.1"
+  page_icon: "🤖"
+  layout: "wide"  # wide, centered
+  
+# Multi-Agent System
+multi_agent:
+  enabled: false  # Set to true to enable by default
+  max_concurrent_tasks: 10
+  task_timeout: 300  # seconds
+  
+  # Agent-specific settings
+  agents:
+    research:
+      enabled: true
+      max_search_results: 10
+      search_timeout: 15
+    
+    analysis:
+      enabled: true
+      max_data_points: 1000
+      
+    code:
+      enabled: true
+      supported_languages: ["python", "javascript", "bash", "sql"]
+      max_code_length: 10000
+      
+    planning:
+      enabled: true
+      max_subtasks: 20
+      
+    summary:
+      enabled: true
+      max_input_length: 50000
+
+# Advanced Features (Phase 4)
+advanced_features:
+  enabled: false  # Set to true to enable by default
+  
+  # Performance & Caching
+  performance:
+    cache_size: 1000
+    cache_ttl: 3600  # seconds
+    monitoring_interval: 60  # seconds
+    
+  # Security & Authentication
+  security:
+    enable_authentication: false
+    session_timeout: 86400  # 24 hours in seconds
+    max_failed_attempts: 5
+    lockout_duration: 1800  # 30 minutes in seconds
+    require_complex_passwords: true
+    
+  # Analytics
+  analytics:
+    enabled: true
+    retention_days: 90
+    metrics_buffer_size: 1000
+    
+  # Tools
+  tools:
+    file_operations:
+      enabled: true
+      max_file_size: 10485760  # 10MB
+      allowed_extensions: [".txt", ".json", ".csv", ".md", ".py", ".js"]
+      
+    database:
+      enabled: true
+      max_query_time: 30  # seconds
+      
+    api_integration:
+      enabled: true
+      request_timeout: 30  # seconds
+
+# Web Search Settings
+web_search:
+  enabled: true
+  provider: "duckduckgo"  # Currently only DuckDuckGo supported
+  max_results: 10
+  timeout: 15
+  safe_search: "moderate"  # strict, moderate, off
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file_logging: false
+  log_file: "logs/minions.log"
+  max_log_size: 10485760  # 10MB
+  backup_count: 5
+
+# System Resource Limits
+resources:
+  max_memory_usage: 8192  # MB (8GB)
+  max_cpu_usage: 80  # percentage
+  max_concurrent_requests: 10
+  request_timeout: 300  # seconds
+
+# Development Settings (for developers)
+development:
+  auto_reload: false
+  show_debug_info: false
+  enable_profiling: false
+  mock_ollama: false  # Use mock responses instead of real Ollama
+
+# Custom Model Configurations
+# Add your own models here
+custom_models:
+  # Example custom model configuration
+  # my_custom_model:
+  #   name: "my_custom_model:latest"
+  #   type: "ollama"
+  #   capabilities: ["text_generation", "reasoning"]
+  #   context_length: 4096
+  #   description: "My custom fine-tuned model"
+
+# Plugin Configuration (future feature)
+plugins:
+  enabled: false
+  plugin_directory: "plugins/"
+  auto_load: true
+
+# Backup and Recovery
+backup:
+  enabled: false
+  backup_directory: "backups/"
+  auto_backup_interval: 86400  # 24 hours
+  max_backups: 7
+
+# Notification Settings
+notifications:
+  enabled: false
+  email_notifications: false
+  desktop_notifications: false
+  
+# API Configuration (future feature)
+api:
+  enabled: false
+  host: "localhost"
+  port: 8502
+  api_key_required: true
+  rate_limiting: true
+  max_requests_per_minute: 60
+
+# Cloud Integration (future feature)
+cloud:
+  enabled: false
+  provider: null  # aws, azure, gcp
+  region: null
+  credentials_file: null
+
+# Experimental Features
+experimental:
+  enabled: false
+  features: []
+  # Available experimental features:
+  # - "voice_input"
+  # - "image_analysis" 
+  # - "document_processing"
+  # - "workflow_automation"
+
+---
+# Configuration Notes:
+# 
+# 1. Copy this file to 'config.yaml' to use custom settings
+# 2. Restart MinionsAI after making changes
+# 3. Invalid configurations will fall back to defaults
+# 4. Check logs for configuration errors
+# 5. Use 'python verify_installation.py' to test changes
+#
+# For more information, see:
+# - QUICKSTART.md for basic setup
+# - PHASE4_ADVANCED_FEATURES.md for advanced configuration
+# - TROUBLESHOOTING.md for common issues

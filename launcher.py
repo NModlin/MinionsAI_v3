@@ -310,6 +310,9 @@ def main() -> None:
     """Main launcher function with advanced GUI support."""
     import argparse
 
+    # Declare global variables at the start
+    global STREAMLIT_PORT, STREAMLIT_HOST, GUI_SCRIPT
+
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="MinionsAI v3.1 Launcher")
     parser.add_argument("--advanced", action="store_true",
@@ -322,7 +325,6 @@ def main() -> None:
     args = parser.parse_args()
 
     # Update configuration based on arguments
-    global STREAMLIT_PORT, STREAMLIT_HOST, GUI_SCRIPT
     STREAMLIT_PORT = args.port
     STREAMLIT_HOST = args.host
 
