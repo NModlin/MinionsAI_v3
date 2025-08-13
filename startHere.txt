@@ -1,0 +1,187 @@
+Project Title: MinionsAI v3.1
+
+
+Primary Objective
+To build a sophisticated, multi-agent AI system named "MinionsAI." The system will serve as an extensible platform for diverse tasks, featuring specialized agents that can reason, use tools, and collaborate to solve complex problems, all accessible through a unified, one-click graphical user interface.
+AI Coding Assistant Persona & Interaction Model
+This project will be developed with you acting as a Specialized AI Coding Assistant. You are a senior full-stack developer with expertise in Python, FastAPI, Streamlit, LangChain, and modern DevOps practices. Your primary role is to act as a collaborative partner, taking high-level goals and breaking them down into concrete, executable plans.
+Agent Mode: For the entire implementation, you will operate in Agent Mode. You must propose a detailed, step-by-step plan for each major task or phase. Each step in your plan should be a specific, verifiable action. After I approve the plan, you will execute it by creating and editing files as needed.
+Memory & Context: This is crucial. You must use your memory to learn from our interactions and my feedback.
+Remember Key Decisions: Remember all architectural choices, technology stacks (e.g., LangGraph, FastAPI, Streamlit), and the phased development plan outlined below. For example, recall that we are prioritizing a unified, one-click desktop application.
+Adapt to Style: Pay attention to my feedback on code style, naming conventions (e.g., snake_case for functions, PascalCase for classes), and comments. Remember these preferences for future code generation.
+Manual Memory Prompts: I will occasionally give you explicit instructions to remember, like: "Hey, remember to always include docstrings for every function."
+Core Philosophy & Strategic Pivot
+CRITICAL REQUIREMENT: Our philosophy is unified, simple, and powerful. We will build a single, self-contained desktop application that the user can run with one click. This application will manage all backend processes and present a clean, modern GUI. This approach avoids separate command-line steps and complex installation, prioritizing an excellent user experience.
+The Development Roadmap: A Phased Approach
+We will build MinionsAI in four distinct phases. This ensures we have a working, valuable prototype at each stage.
+Phase 1: The Core Agent Engine ⚙️
+Goal: Create a single, tool-using AI agent that can be controlled from a simple script. This is our foundation.
+Task 1.1: Environment Setup [COMPLETED]:
+The local development environment has been automated with the setup.sh script below. This script handles dependency checks, Ollama installation, project directory creation, and Python package installation in a single run.
+Task 1.2: Build the First Agent Graph:
+Using LangGraph, define a simple graph with an "Agent" node (to think) and a "Tool" node (to act).
+Give the agent its first tool: a web search using the duckduckgo-search library.
+Task 1.3: Test the Agent:
+Create a simple test runner in the script to invoke the agent and see it reason and use its tool.
+Phase 2: The Unified GUI Application 🖥️
+... (Phases 2-4 remain the same) ...
+Technology Stacks
+... (Technology stacks remain the same) ...
+Code Quality Standards & Templates
+... (Templates remain the same) ...
+Deliverable for Task 1.1: One-Click Setup Script
+Here is the all-in-one setup.sh script that completes Task 1.1.
+#!/bin/bash
+
+# setup.sh: All-in-one environment setup script for MinionsAI.
+# This script is designed for macOS and Linux systems.
+
+# --- Configuration ---
+PROJECT_DIR="minionsai"
+VENV_NAME=".venv"
+PYTHON_CMD="python3.11" # Specify Python 3.11 or higher
+OLLAMA_MODEL="llama3:8b"
+REQUIREMENTS_FILE="requirements.txt"
+
+# --- Colors for Output ---
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# --- Helper Functions ---
+print_info() {
+    echo -e "${GREEN}[INFO] $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING] $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR] $1${NC}"
+}
+
+# Exit script on any error
+set -e
+
+# --- Main Script ---
+print_info "Starting MinionsAI Environment Setup..."
+
+# 1. Check for Prerequisites
+print_info "Step 1: Checking for required tools (Python 3.11+, pip, curl)..."
+if ! command -v $PYTHON_CMD &> /dev/null; then
+    print_error "$PYTHON_CMD could not be found. Please install Python 3.11 or higher and ensure it's in your PATH."
+    exit 1
+fi
+if ! command -v pip &> /dev/null; then
+    print_error "pip could not be found. Please ensure pip is installed for your Python version."
+    exit 1
+fi
+if ! command -v curl &> /dev/null; then
+    print_error "curl could not be found. Please install curl."
+    exit 1
+fi
+print_info "Prerequisites found."
+
+# 2. Check and Install Ollama
+print_info "Step 2: Checking for Ollama..."
+if ! command -v ollama &> /dev/null; then
+    print_warning "Ollama not found. Attempting to install..."
+    curl -fsSL https://ollama.com/install.sh | sh
+    print_info "Ollama installed successfully. Please ensure the Ollama application is running."
+else
+    print_info "Ollama is already installed."
+fi
+
+# Ensure Ollama app is running
+print_info "Please make sure the Ollama desktop application is running before proceeding."
+until ollama --version &> /dev/null; do
+    print_warning "Waiting for the Ollama service to start... (Please launch the Ollama app if you haven't)"
+    sleep 5
+done
+
+# 3. Pull the Ollama Model
+print_info "Step 3: Pulling the required LLM model: $OLLAMA_MODEL..."
+if ! ollama list | grep -q "$OLLAMA_MODEL"; then
+    print_info "Model '$OLLAMA_MODEL' not found locally. Pulling from Ollama Hub..."
+    ollama pull "$OLLAMA_MODEL"
+    print_info "Model pulled successfully."
+else
+    print_info "Model '$OLLAMA_MODEL' is already available."
+fi
+
+# 4. Create Project Directory and Files
+print_info "Step 4: Setting up project directory and virtual environment..."
+if [ -d "$PROJECT_DIR" ]; then
+    print_warning "Project directory '$PROJECT_DIR' already exists. Skipping creation."
+else
+    mkdir -p "$PROJECT_DIR"
+    print_info "Created directory: $PROJECT_DIR"
+fi
+cd "$PROJECT_DIR"
+
+# Create requirements.txt
+print_info "Creating '$REQUIREMENTS_FILE'..."
+cat << EOF > $REQUIREMENTS_FILE
+# Phase 1 Dependencies for MinionsAI
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+streamlit==1.35.0
+langchain==0.1.20
+langgraph==0.0.48
+langchain-community==0.0.38
+duckduckgo-search==5.3.1b1
+python-dotenv==1.0.1
+ollama==0.2.0
+pydantic<3,>2
+EOF
+
+# 5. Setup Python Virtual Environment and Install Dependencies
+if [ -d "$VENV_NAME" ]; then
+    print_warning "Virtual environment '$VENV_NAME' already exists. Activating it."
+else
+    print_info "Creating Python virtual environment..."
+    $PYTHON_CMD -m venv $VENV_NAME
+fi
+
+print_info "Activating virtual environment..."
+source "$VENV_NAME/bin/activate"
+
+print_info "Upgrading pip..."
+pip install --upgrade pip
+
+print_info "Installing dependencies from '$REQUIREMENTS_FILE'..."
+pip install -r "$REQUIREMENTS_FILE"
+
+# 6. Verification
+print_info "Step 6: Verifying installation..."
+pip freeze > installed_packages.txt
+print_info "A list of installed packages has been saved to 'installed_packages.txt'."
+
+print_info "--------------------------------------------------"
+print_info "✅ MinionsAI environment setup is complete!"
+print_info "To get started, navigate to the '$PROJECT_DIR' directory and activate the environment with:"
+print_info "cd $PROJECT_DIR"
+print_info "source $VENV_NAME/bin/activate"
+print_info "--------------------------------------------------"
+
+
+IMMEDIATE ACTION REQUIRED: Let's Begin
+Our focus is now on Phase 1, Task 1.2: Build the First Agent Graph.
+Please prepare a detailed plan to create the first agent. The environment is now set up inside the minionsai directory.
+Context for the AI: The goal is to create a single Python script named agent_runner.py inside the minionsai directory. This script will define and run a basic LangGraph agent that can use the DuckDuckGo search tool.
+Your Proposed Plan Should Include:
+File Creation:
+The command to create the agent_runner.py file.
+Code Structure:
+A breakdown of the Python code that will go into agent_runner.py. This should include:
+Necessary imports (from langgraph, langchain, ollama, etc.).
+Setting up the tool (DuckDuckGo search).
+Defining the agent's state.
+Creating the agent node function.
+Creating the tool node function.
+Assembling the graph and defining the edges.
+Compiling the graph.
+Code to invoke the graph with a sample query and print the result.
+Once I approve the plan, you will provide the complete code for agent_runner.py.

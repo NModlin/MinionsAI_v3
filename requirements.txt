@@ -1,0 +1,81 @@
+# MinionsAI v3.1 - Complete Dependencies
+# Phase 2: Unified GUI Application
+
+# Core AI and LangChain dependencies
+langchain==0.3.27
+langgraph==0.6.4
+langchain-community==0.3.27
+langchain-core==0.3.74
+langchain-text-splitters==0.3.9
+langchain-ollama==0.3.6
+langsmith>=0.4.13
+
+# Ollama integration
+ollama>=0.5.3
+
+# Web search capabilities
+duckduckgo-search>=8.1.1
+
+# GUI Framework
+streamlit>=1.48.0
+
+# Web framework (for future API endpoints)
+fastapi>=0.116.1
+uvicorn[standard]>=0.30.0
+
+# System monitoring and utilities
+psutil>=6.0.0
+requests>=2.32.4
+
+# Data handling and validation
+pydantic>=2.11.7
+pydantic-settings>=2.10.1
+
+# Environment and configuration
+python-dotenv>=1.1.1
+
+# HTTP and networking
+httpx>=0.28.1
+httpx-sse>=0.4.1
+aiohttp>=3.12.15
+
+# Data processing
+pandas>=2.3.1
+numpy>=2.3.2
+
+# Async support
+anyio>=4.10.0
+tenacity>=9.1.2
+
+# JSON and data serialization
+orjson>=3.11.1
+dataclasses-json>=0.6.7
+
+# Typing and validation
+typing-extensions>=4.14.1
+typing-inspect>=0.9.0
+annotated-types>=0.7.0
+
+# Utilities
+click>=8.2.1
+toml>=0.10.2
+PyYAML>=6.0.2
+
+# Security and encoding
+certifi>=2025.8.3
+charset-normalizer>=3.4.3
+urllib3>=2.5.0
+idna>=3.10
+
+# Development and debugging (optional)
+# pytest>=8.0.0
+# pytest-asyncio>=0.24.0
+# black>=24.0.0
+# flake8>=7.0.0
+
+# Platform-specific dependencies
+# Windows
+# pywin32>=306; sys_platform == "win32"
+
+# macOS/Linux
+# python-magic>=0.4.27; sys_platform != "win32"
