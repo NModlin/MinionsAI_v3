@@ -27,6 +27,7 @@ OLLAMA_MODEL = "llama3:8b"
 STREAMLIT_PORT = 8501
 STREAMLIT_HOST = "localhost"
 GUI_SCRIPT = "minions_gui.py"
+ADVANCED_GUI_SCRIPT = "minions_gui_advanced.py"
 
 # Colors for console output
 class Colors:
@@ -273,11 +274,30 @@ def start_streamlit() -> Optional[subprocess.Popen]:
         return None
 
 
+def check_advanced_dependencies() -> bool:
+    """Check if advanced features dependencies are available."""
+    advanced_deps = ['bcrypt', 'jwt', 'plotly', 'pandas']
+    missing_deps = []
+
+    for dep in advanced_deps:
+        try:
+            __import__(dep)
+        except ImportError:
+            missing_deps.append(dep)
+
+    if missing_deps:
+        print_colored(f"⚠️  Missing advanced dependencies: {', '.join(missing_deps)}", Colors.YELLOW)
+        print_colored("Install with: pip install bcrypt PyJWT plotly pandas", Colors.YELLOW)
+        return False
+
+    return True
+
+
 def open_browser() -> None:
     """Open the application in the default browser."""
     url = f"http://{STREAMLIT_HOST}:{STREAMLIT_PORT}"
     print_colored(f"🌐 Opening browser: {url}", Colors.BLUE)
-    
+
     try:
         webbrowser.open(url)
         print_colored("✅ Browser opened successfully", Colors.GREEN)
@@ -287,45 +307,80 @@ def open_browser() -> None:
 
 
 def main() -> None:
-    """Main launcher function."""
+    """Main launcher function with advanced GUI support."""
+    import argparse
+
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="MinionsAI v3.1 Launcher")
+    parser.add_argument("--advanced", action="store_true",
+                       help="Launch advanced GUI with enterprise features")
+    parser.add_argument("--port", type=int, default=STREAMLIT_PORT,
+                       help=f"Port for Streamlit server (default: {STREAMLIT_PORT})")
+    parser.add_argument("--host", type=str, default=STREAMLIT_HOST,
+                       help=f"Host for Streamlit server (default: {STREAMLIT_HOST})")
+
+    args = parser.parse_args()
+
+    # Update configuration based on arguments
+    global STREAMLIT_PORT, STREAMLIT_HOST, GUI_SCRIPT
+    STREAMLIT_PORT = args.port
+    STREAMLIT_HOST = args.host
+
+    if args.advanced:
+        GUI_SCRIPT = ADVANCED_GUI_SCRIPT
+        print_colored("🚀 Launching Advanced MinionsAI with Enterprise Features", Colors.BOLD)
+    else:
+        print_colored("🚀 Launching Standard MinionsAI", Colors.BOLD)
+
     print_header()
-    
+
     # Check system requirements
     if not check_python_version():
         return
-    
+
     if not check_dependencies():
         return
-    
+
+    # Additional checks for advanced GUI
+    if args.advanced:
+        print_colored("🔧 Checking advanced features dependencies...", Colors.YELLOW)
+        if not check_advanced_dependencies():
+            print_colored("⚠️  Some advanced features may not work properly", Colors.YELLOW)
+        else:
+            print_colored("✅ Advanced features ready", Colors.GREEN)
+
     # Start Ollama service
     if not start_ollama():
         print_colored("❌ Cannot proceed without Ollama service", Colors.RED)
         return
-    
+
     # Check/pull model
     if not check_model():
         print_colored("📥 Model not found, attempting to pull...", Colors.YELLOW)
         if not pull_model():
             print_colored("❌ Cannot proceed without the required model", Colors.RED)
             return
-    
+
     # Start GUI
     streamlit_process = start_streamlit()
     if not streamlit_process:
         print_colored("❌ Failed to start GUI application", Colors.RED)
         return
-    
+
     # Open browser
     time.sleep(2)  # Give Streamlit more time to fully start
     open_browser()
-    
+
     # Success message
     print()
-    print_colored("🎉 MinionsAI is now running!", Colors.GREEN)
+    gui_name = "Advanced MinionsAI" if args.advanced else "MinionsAI"
+    print_colored(f"🎉 {gui_name} is now running!", Colors.GREEN)
+    if args.advanced:
+        print_colored("🔥 Advanced features enabled: Analytics, Security, Multi-Model Support", Colors.BLUE)
     print_colored(f"🌐 Access URL: http://{STREAMLIT_HOST}:{STREAMLIT_PORT}", Colors.BLUE)
     print_colored("Press Ctrl+C to stop the application", Colors.YELLOW)
     print()
-    
+
     try:
         # Keep the launcher running
         streamlit_process.wait()

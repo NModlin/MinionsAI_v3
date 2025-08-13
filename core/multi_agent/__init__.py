@@ -7,8 +7,8 @@ __version__ = "3.1.0"
 __author__ = "MinionsAI Team"
 
 # Core multi-agent imports
-from .agent_registry import AgentRegistry
-from .coordinator import MultiAgentCoordinator
+from .agent_registry import AgentRegistry, AgentCapability, AgentStatus, AgentInfo
+from .coordinator import MultiAgentCoordinator, TaskPriority, TaskStatus, Task, Workflow, WorkflowStep
 from .communication import AgentCommunication, Message, MessageType
 
 # Agent imports
@@ -31,19 +31,27 @@ from .workflows import (
 __all__ = [
     # Core system
     "AgentRegistry",
-    "MultiAgentCoordinator", 
+    "AgentCapability",
+    "AgentStatus",
+    "AgentInfo",
+    "MultiAgentCoordinator",
+    "TaskPriority",
+    "TaskStatus",
+    "Task",
+    "Workflow",
+    "WorkflowStep",
     "AgentCommunication",
     "Message",
     "MessageType",
-    
+
     # Agents
     "BaseAgent",
     "ResearchAgent",
-    "AnalysisAgent", 
+    "AnalysisAgent",
     "CodeAgent",
     "PlanningAgent",
     "SummaryAgent",
-    
+
     # Workflows
     "ResearchWorkflow",
     "CodingWorkflow",

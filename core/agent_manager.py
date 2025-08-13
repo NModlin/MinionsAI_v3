@@ -26,6 +26,15 @@ from .multi_agent import (
     AgentCapability, TaskPriority, Message, MessageType
 )
 
+# Advanced features imports
+from .advanced import (
+    PerformanceMonitor, CacheManager, AsyncTaskManager,
+    SecurityManager, AuthenticationManager,
+    ModelManager, ModelOptimizer,
+    AdvancedToolManager, CustomToolFramework,
+    AnalyticsEngine, MetricsCollector
+)
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -114,10 +123,11 @@ def duckduckgo_search(query: str, max_results: int = 5) -> str:
 
 class AgentManager:
     """
-    Enhanced Agent Manager that supports both single agent and multi-agent modes.
+    Enhanced Agent Manager that supports both single agent and multi-agent modes with advanced features.
     """
 
-    def __init__(self, model_name: str = "llama3:8b", base_url: str = "http://localhost:11434", multi_agent_mode: bool = False):
+    def __init__(self, model_name: str = "llama3:8b", base_url: str = "http://localhost:11434",
+                 multi_agent_mode: bool = False, enable_advanced_features: bool = True):
         """
         Initialize the Agent Manager.
 
@@ -125,10 +135,12 @@ class AgentManager:
             model_name: Name of the Ollama model to use
             base_url: Base URL for the Ollama service
             multi_agent_mode: Whether to enable multi-agent system
+            enable_advanced_features: Whether to enable advanced features
         """
         self.model_name = model_name
         self.base_url = base_url
         self.multi_agent_mode = multi_agent_mode
+        self.enable_advanced_features = enable_advanced_features
         self.llm: Optional[OllamaLLM] = None
         self.agent_app = None
         self.tools = [duckduckgo_search]
@@ -140,6 +152,17 @@ class AgentManager:
         self.coordinator: Optional[MultiAgentCoordinator] = None
         self.communication: Optional[AgentCommunication] = None
         self.specialized_agents: Dict[str, Any] = {}
+
+        # Advanced features components
+        self.performance_monitor: Optional[PerformanceMonitor] = None
+        self.cache_manager: Optional[CacheManager] = None
+        self.task_manager: Optional[AsyncTaskManager] = None
+        self.security_manager: Optional[SecurityManager] = None
+        self.auth_manager: Optional[AuthenticationManager] = None
+        self.model_manager: Optional[ModelManager] = None
+        self.tool_manager: Optional[AdvancedToolManager] = None
+        self.analytics_engine: Optional[AnalyticsEngine] = None
+        self.metrics_collector: Optional[MetricsCollector] = None
 
         # System prompt for the agent
         self.system_prompt = """You are MinionsAI, a helpful AI assistant with access to web search capabilities.
@@ -160,13 +183,19 @@ Always explain your reasoning and cite sources when using search results."""
     
     def initialize(self) -> bool:
         """
-        Initialize the agent system (single or multi-agent).
+        Initialize the agent system (single or multi-agent) with advanced features.
 
         Returns:
             bool: True if initialization successful, False otherwise
         """
         try:
-            logger.info(f"Initializing MinionsAI Agent Manager (Multi-agent: {self.multi_agent_mode})...")
+            logger.info(f"Initializing MinionsAI Agent Manager (Multi-agent: {self.multi_agent_mode}, Advanced: {self.enable_advanced_features})...")
+
+            # Initialize advanced features first
+            if self.enable_advanced_features:
+                success = asyncio.run(self._initialize_advanced_features())
+                if not success:
+                    logger.warning("Advanced features initialization failed, continuing with basic features")
 
             # Initialize the LLM
             self.llm = OllamaLLM(model=self.model_name, base_url=self.base_url)
@@ -254,6 +283,65 @@ Always explain your reasoning and cite sources when using search results."""
         # Compile the graph
         self.agent_app = workflow.compile()
 
+    async def _initialize_advanced_features(self) -> bool:
+        """Initialize advanced features."""
+        try:
+            # Initialize metrics collector
+            self.metrics_collector = MetricsCollector()
+            logger.info("✅ Metrics collector initialized")
+
+            # Initialize cache manager
+            self.cache_manager = CacheManager(max_size=1000, default_ttl=3600)
+            logger.info("✅ Cache manager initialized")
+
+            # Initialize async task manager
+            self.task_manager = AsyncTaskManager(max_concurrent_tasks=10)
+            await self.task_manager.start()
+            logger.info("✅ Async task manager started")
+
+            # Initialize performance monitor
+            self.performance_monitor = PerformanceMonitor()
+            self.performance_monitor.set_cache_manager(self.cache_manager)
+            self.performance_monitor.set_task_manager(self.task_manager)
+            await self.performance_monitor.start_monitoring()
+            logger.info("✅ Performance monitor started")
+
+            # Initialize security manager
+            self.security_manager = SecurityManager()
+            self.auth_manager = AuthenticationManager(self.security_manager)
+            logger.info("✅ Security system initialized")
+
+            # Initialize model manager
+            self.model_manager = ModelManager()
+            # Register default Ollama model
+            from .advanced.models import ModelType, ModelCapability
+            self.model_manager.register_model(
+                name=self.model_name,
+                model_type=ModelType.OLLAMA,
+                capabilities=[
+                    ModelCapability.TEXT_GENERATION,
+                    ModelCapability.REASONING,
+                    ModelCapability.ANALYSIS
+                ],
+                base_url=self.base_url
+            )
+            await self.model_manager.initialize_models()
+            logger.info("✅ Model manager initialized")
+
+            # Initialize advanced tool manager
+            self.tool_manager = AdvancedToolManager()
+            logger.info("✅ Advanced tool manager initialized")
+
+            # Initialize analytics engine
+            self.analytics_engine = AnalyticsEngine(self.metrics_collector)
+            logger.info("✅ Analytics engine initialized")
+
+            return True
+
+        except Exception as e:
+            logger.error(f"Error initializing advanced features: {e}")
+            return False
+
     async def _initialize_multi_agent_system(self) -> bool:
         """Initialize the multi-agent system."""
         try:
@@ -333,13 +421,16 @@ Always explain your reasoning and cite sources when using search results."""
             return self.initialize()
         return True
     
-    def process_message(self, user_message: str, agent_type: Optional[str] = None) -> str:
+    def process_message(self, user_message: str, agent_type: Optional[str] = None,
+                       user_id: Optional[str] = None, session_id: Optional[str] = None) -> str:
         """
-        Process a user message and return the agent's response.
+        Process a user message and return the agent's response with advanced features.
 
         Args:
             user_message: The user's input message
             agent_type: Specific agent type to use (for multi-agent mode)
+            user_id: User identifier for analytics
+            session_id: Session identifier for analytics
 
         Returns:
             str: The agent's response
@@ -347,24 +438,79 @@ Always explain your reasoning and cite sources when using search results."""
         if not self.is_initialized:
             return "❌ Agent not initialized. Please check system status."
 
+        start_time = time.time()
+        success = True
+
         try:
             self.state.is_processing = True
             self.state.add_message("user", user_message)
 
-            if self.multi_agent_mode and self.coordinator:
-                # Use multi-agent system
-                return asyncio.run(self._process_with_multi_agent(user_message, agent_type))
-            else:
-                # Use single agent system
-                return self._process_with_single_agent(user_message)
+            # Record analytics event
+            if self.metrics_collector:
+                from .advanced.analytics import EventType
+                self.metrics_collector.record_event(
+                    EventType.MESSAGE_SENT,
+                    user_id=user_id,
+                    session_id=session_id,
+                    data={"message_length": len(user_message), "agent_type": agent_type}
+                )
+
+            # Check cache first
+            response = None
+            if self.cache_manager:
+                cache_key = f"response:{hash(user_message)}"
+                response = self.cache_manager.get(cache_key)
+                if response:
+                    logger.debug("Response served from cache")
+
+            if response is None:
+                if self.multi_agent_mode and self.coordinator:
+                    # Use multi-agent system
+                    response = asyncio.run(self._process_with_multi_agent(user_message, agent_type))
+                else:
+                    # Use single agent system
+                    response = self._process_with_single_agent(user_message)
+
+                # Cache the response
+                if self.cache_manager and response:
+                    cache_key = f"response:{hash(user_message)}"
+                    self.cache_manager.set(cache_key, response, ttl=1800)  # 30 minutes
+
+            return response
 
         except Exception as e:
+            success = False
             error_msg = f"Error processing message: {str(e)}"
             logger.error(error_msg)
+
+            # Record error event
+            if self.metrics_collector:
+                from .advanced.analytics import EventType
+                self.metrics_collector.record_event(
+                    EventType.ERROR_OCCURRED,
+                    user_id=user_id,
+                    session_id=session_id,
+                    data={"error": str(e), "message": user_message}
+                )
+
             return error_msg
 
         finally:
             self.state.is_processing = False
+
+            # Record performance metrics
+            response_time = time.time() - start_time
+            if self.performance_monitor:
+                self.performance_monitor.record_request(response_time, success)
+
+            if self.metrics_collector:
+                from .advanced.analytics import MetricType
+                self.metrics_collector.record_metric(
+                    "response_time",
+                    response_time,
+                    MetricType.TIMER,
+                    tags={"agent_type": agent_type or "single", "success": str(success)}
+                )
 
     def _process_with_single_agent(self, user_message: str) -> str:
         """Process message with single agent system."""
